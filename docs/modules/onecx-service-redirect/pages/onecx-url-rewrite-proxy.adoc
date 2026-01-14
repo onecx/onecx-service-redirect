@@ -1,0 +1,53 @@
+[.configuration-legend]
+icon:lock[title=Fixed at build time] Configuration property fixed at build time - All other configuration properties are overridable at runtime
+[.configuration-reference.searchable, cols="80,.^10,.^10"]
+|===
+
+h|[.header-title]##Configuration property##
+h|Type
+h|Default
+
+a| [[onecx-url-rewrite-proxy_onecx-proxy-url-rewrite-rules-url-rewrite-rules-pattern]] [.property-path]##link:#onecx-url-rewrite-proxy_onecx-proxy-url-rewrite-rules-url-rewrite-rules-pattern[`onecx.proxy.url-rewrite-rules."url-rewrite-rules".pattern`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++onecx.proxy.url-rewrite-rules."url-rewrite-rules".pattern+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Pattern to match an incoming request
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++ONECX_PROXY_URL_REWRITE_RULES__URL_REWRITE_RULES__PATTERN+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++ONECX_PROXY_URL_REWRITE_RULES__URL_REWRITE_RULES__PATTERN+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|required icon:exclamation-circle[title=Configuration property is required]
+
+a| [[onecx-url-rewrite-proxy_onecx-proxy-url-rewrite-rules-url-rewrite-rules-replace-pattern]] [.property-path]##link:#onecx-url-rewrite-proxy_onecx-proxy-url-rewrite-rules-url-rewrite-rules-replace-pattern[`onecx.proxy.url-rewrite-rules."url-rewrite-rules".replace-pattern`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++onecx.proxy.url-rewrite-rules."url-rewrite-rules".replace-pattern+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Replace-pattern to rewrite the incoming request
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++ONECX_PROXY_URL_REWRITE_RULES__URL_REWRITE_RULES__REPLACE_PATTERN+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++ONECX_PROXY_URL_REWRITE_RULES__URL_REWRITE_RULES__REPLACE_PATTERN+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|required icon:exclamation-circle[title=Configuration property is required]
+
+|===
+

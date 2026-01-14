@@ -1,0 +1,5 @@
+
+:docker-registry: https://github.com/onecx/onecx-url-rewrite-proxy/pkgs/container/onecx-url-rewrite-proxy
+:helm-registry: https://github.com/onecx/onecx-url-rewrite-proxy/pkgs/container/charts%2Fonecx-url-rewrite-proxy
+:properties-file: src/main/resources/application.properties
+:helm-file: src/main/helm/values.yaml

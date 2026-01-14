@@ -1,0 +1,35 @@
+
+include::onecx-service-redirect-attributes.adoc[opts=optional]
+
+{docker-registry}[Link to Docker registry]
+
+== Default properties
+
+.{properties-file}
+[%collapsible]
+====
+[source,properties,subs=attributes+]
+----
+tkit.security-dynamic-test.openapi.enabled=false
+----
+====
+
+== Extensions
+.Extensions List
+[%collapsible]
+====
+include::onecx-service-redirect-extensions.adoc[opts=optional]
+====
+
+== Helm
+
+{helm-registry}[Link to Helm registry]
+
+.Default values in {helm-file}
+[source,yaml]
+----
+app:
+  name: svc
+  image:
+    repository: "onecx/onecx-service-redirect"
+----
