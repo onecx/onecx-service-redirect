@@ -1,0 +1,9 @@
+include::onecx-service-redirect-attributes.adoc[opts=optional]
+
+= OneCX Service Smart Redirect
+
+
+== Configuration
+include::onecx-service-redirect.adoc[opts=optional]
+
+include::onecx-service-redirect-docs.adoc[opts=optional]
