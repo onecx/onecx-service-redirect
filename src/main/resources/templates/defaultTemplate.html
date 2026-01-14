@@ -1,0 +1,33 @@
+<html>
+<head>
+    <script>
+        let pattern = "{p1}";
+        let replacePattern = "{p2}";
+    </script>
+    <script>
+          try {
+            const fullUrl = window.location.href;
+            const regex = new RegExp(pattern);
+            const match = fullUrl.match(regex);
+            console.log(fullUrl);
+            console.log(match);
+
+            if (match && match.groups) {
+              let newUrl = replacePattern;
+
+            for (const [key, value] of Object.entries(match.groups)) {
+              newUrl = newUrl.replace("($" + key + ")", value);
+            }
+            console.log("Redirecting to:", newUrl);
+            window.location.href = newUrl;
+          }
+
+        } catch (e) {
+          console.error("Redirect failed:", e);
+        }
+    </script>
+    <noscript>
+        <p>You need to enable JavaScript!</p>
+    </noscript>
+</head>
+</html>

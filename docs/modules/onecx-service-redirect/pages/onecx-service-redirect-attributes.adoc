@@ -1,0 +1,5 @@
+
+:docker-registry: https://github.com/onecx/onecx-service-redirect/pkgs/container/onecx-service-redirect
+:helm-registry: https://github.com/onecx/onecx-service-redirect/pkgs/container/charts%2Fonecx-service-redirect
+:properties-file: src/main/resources/application.properties
+:helm-file: src/main/helm/values.yaml

@@ -1,0 +1,4 @@
+app:
+  name: svc
+  image:
+    repository: "onecx/onecx-service-redirect"
