@@ -46,8 +46,13 @@ public class RedirectRestController {
 
         RedirectConfig.RewriteRule rule = redirectConfig.urlRewriteRules().entrySet().stream()
                 .filter(entry -> fullPath.matches(entry.getKey()))
+                .max((e1, e2) -> {
+                    // Prefer the more specific pattern (longer pattern = more specific)
+                    int matchLength1 = e1.getKey().replaceAll("\\.\\*", "").length();
+                    int matchLength2 = e2.getKey().replaceAll("\\.\\*", "").length();
+                    return Integer.compare(matchLength1, matchLength2);
+                })
                 .map(Map.Entry::getValue)
-                .findFirst()
                 .orElse(null);
 
         Template tpl = defaultTemplate;

@@ -7,9 +7,9 @@ h|[.header-title]##Configuration property##
 h|Type
 h|Default
 
-a| [[onecx-service-redirect_onecx-service-redirect-url-rewrite-rules-url-rewrite-rules-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-service-redirect-url-rewrite-rules-url-rewrite-rules-pattern[`onecx.service.redirect.url-rewrite-rules."url-rewrite-rules".pattern`]##
+a| [[onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-pattern[`onecx.redirect.url-rewrite-rules."url-rewrite-rules".pattern`]##
 ifdef::add-copy-button-to-config-props[]
-config_property_copy_button:+++onecx.service.redirect.url-rewrite-rules."url-rewrite-rules".pattern+++[]
+config_property_copy_button:+++onecx.redirect.url-rewrite-rules."url-rewrite-rules".pattern+++[]
 endif::add-copy-button-to-config-props[]
 
 
@@ -19,18 +19,18 @@ Pattern to match an incoming request
 
 
 ifdef::add-copy-button-to-env-var[]
-Environment variable: env_var_with_copy_button:+++ONECX_SERVICE_REDIRECT_URL_REWRITE_RULES__URL_REWRITE_RULES__PATTERN+++[]
+Environment variable: env_var_with_copy_button:+++ONECX_REDIRECT_URL_REWRITE_RULES__URL_REWRITE_RULES__PATTERN+++[]
 endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
-Environment variable: `+++ONECX_SERVICE_REDIRECT_URL_REWRITE_RULES__URL_REWRITE_RULES__PATTERN+++`
+Environment variable: `+++ONECX_REDIRECT_URL_REWRITE_RULES__URL_REWRITE_RULES__PATTERN+++`
 endif::add-copy-button-to-env-var[]
 --
 |string
 |required icon:exclamation-circle[title=Configuration property is required]
 
-a| [[onecx-service-redirect_onecx-service-redirect-url-rewrite-rules-url-rewrite-rules-replace-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-service-redirect-url-rewrite-rules-url-rewrite-rules-replace-pattern[`onecx.service.redirect.url-rewrite-rules."url-rewrite-rules".replace-pattern`]##
+a| [[onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-replace-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-replace-pattern[`onecx.redirect.url-rewrite-rules."url-rewrite-rules".replace-pattern`]##
 ifdef::add-copy-button-to-config-props[]
-config_property_copy_button:+++onecx.service.redirect.url-rewrite-rules."url-rewrite-rules".replace-pattern+++[]
+config_property_copy_button:+++onecx.redirect.url-rewrite-rules."url-rewrite-rules".replace-pattern+++[]
 endif::add-copy-button-to-config-props[]
 
 
@@ -40,18 +40,18 @@ Replace-pattern to rewrite the incoming request
 
 
 ifdef::add-copy-button-to-env-var[]
-Environment variable: env_var_with_copy_button:+++ONECX_SERVICE_REDIRECT_URL_REWRITE_RULES__URL_REWRITE_RULES__REPLACE_PATTERN+++[]
+Environment variable: env_var_with_copy_button:+++ONECX_REDIRECT_URL_REWRITE_RULES__URL_REWRITE_RULES__REPLACE_PATTERN+++[]
 endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
-Environment variable: `+++ONECX_SERVICE_REDIRECT_URL_REWRITE_RULES__URL_REWRITE_RULES__REPLACE_PATTERN+++`
+Environment variable: `+++ONECX_REDIRECT_URL_REWRITE_RULES__URL_REWRITE_RULES__REPLACE_PATTERN+++`
 endif::add-copy-button-to-env-var[]
 --
 |string
 |required icon:exclamation-circle[title=Configuration property is required]
 
-a| [[onecx-service-redirect_onecx-service-redirect-custom-template-path]] [.property-path]##link:#onecx-service-redirect_onecx-service-redirect-custom-template-path[`onecx.service.redirect.custom-template-path`]##
+a| [[onecx-service-redirect_onecx-redirect-custom-template-path]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-custom-template-path[`onecx.redirect.custom-template-path`]##
 ifdef::add-copy-button-to-config-props[]
-config_property_copy_button:+++onecx.service.redirect.custom-template-path+++[]
+config_property_copy_button:+++onecx.redirect.custom-template-path+++[]
 endif::add-copy-button-to-config-props[]
 
 
@@ -61,10 +61,10 @@ File path to custom template
 
 
 ifdef::add-copy-button-to-env-var[]
-Environment variable: env_var_with_copy_button:+++ONECX_SERVICE_REDIRECT_CUSTOM_TEMPLATE_PATH+++[]
+Environment variable: env_var_with_copy_button:+++ONECX_REDIRECT_CUSTOM_TEMPLATE_PATH+++[]
 endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
-Environment variable: `+++ONECX_SERVICE_REDIRECT_CUSTOM_TEMPLATE_PATH+++`
+Environment variable: `+++ONECX_REDIRECT_CUSTOM_TEMPLATE_PATH+++`
 endif::add-copy-button-to-env-var[]
 --
 |string

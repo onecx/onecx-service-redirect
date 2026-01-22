@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -58,6 +59,48 @@ class RedirectRestControllerTest {
                 .extract().asString();
 
         assertThat(body).contains("/some/unknown/path");
+    }
+
+    @Test
+    void appliesBestMatchingRule() {
+        var ruleMap = new HashMap<String, RedirectConfig.RewriteRule>();
+
+        ruleMap.put(".*test-ui.*", new RedirectConfig.RewriteRule() {
+            @Override
+            public String pattern() {
+                return ".*test-ui.*";
+            }
+
+            @Override
+            public String replacePattern() {
+                return "/new/path";
+            }
+        });
+
+        ruleMap.put(".*test-ui/subTest.*", new RedirectConfig.RewriteRule() {
+            @Override
+            public String pattern() {
+                return ".*test-ui/subTest.*";
+            }
+
+            @Override
+            public String replacePattern() {
+                return "/new/path/subTest";
+            }
+        });
+
+        Mockito.when(redirectConfig.urlRewriteRules()).thenReturn(ruleMap);
+        Mockito.when(redirectConfig.customTemplatePath()).thenReturn(Optional.empty());
+
+        var body = given()
+                .accept(TEXT_HTML)
+                .get("/test-ui/subTest")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().asString();
+
+        assertThat(body).contains(".*test-ui/subTest.*");
+        assertThat(body).contains("/new/path/subTest");
     }
 
     @Test
