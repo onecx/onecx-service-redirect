@@ -28,7 +28,7 @@ import io.quarkus.qute.Template;
 public class RedirectRestController {
 
     @Inject
-    Template defaultTemplate;
+    Template redirectTemplate;
 
     @Inject
     Template fallbackTemplate;
@@ -55,21 +55,37 @@ public class RedirectRestController {
                 .map(Map.Entry::getValue)
                 .orElse(null);
 
-        Template tpl = defaultTemplate;
+        Template tpl = redirectTemplate;
 
-        // if no matching rule is found, use fallback template to keep original requested path
+        // if no matching rule is found, use fallback template
         if (rule == null) {
             tpl = fallbackTemplate;
+
+            // use custom fallback template if provided
+            if (redirectConfig.customFallbackTemplatePath().isPresent()) {
+                try {
+                    String content = Files.readString(Paths.get(redirectConfig.customFallbackTemplatePath().get()),
+                            StandardCharsets.UTF_8);
+                    tpl = engine.parse(content);
+                } catch (IOException e) {
+                    Log.error(
+                            "Failed to load custom fallback template from path: " + redirectConfig.customFallbackTemplatePath(),
+                            e);
+                }
+            }
+
             return Response.ok(tpl.data("reqPath", fullPath).render()).build();
         }
 
-        // use custom template if provided
-        if (redirectConfig.customTemplatePath().isPresent()) {
+        // use custom redirect template if provided
+        if (redirectConfig.customRedirectTemplatePath().isPresent()) {
             try {
-                String content = Files.readString(Paths.get(redirectConfig.customTemplatePath().get()), StandardCharsets.UTF_8);
+                String content = Files.readString(Paths.get(redirectConfig.customRedirectTemplatePath().get()),
+                        StandardCharsets.UTF_8);
                 tpl = engine.parse(content);
             } catch (IOException e) {
-                Log.error("Failed to load custom template from path: " + redirectConfig.customTemplatePath(), e);
+                Log.error("Failed to load custom redirect template from path: " + redirectConfig.customRedirectTemplatePath(),
+                        e);
             }
         }
 
