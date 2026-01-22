@@ -75,8 +75,7 @@ class RedirectRestControllerTest {
                 .then()
                 .statusCode(OK.getStatusCode())
                 .extract().asString();
-        assertThat(body).contains("custom");
-        assertThat(body).contains("some/unknown/path");
+        assertThat(body).contains("custom").contains("some/unknown/path");
     }
 
     @Test
@@ -94,8 +93,7 @@ class RedirectRestControllerTest {
                 .statusCode(OK.getStatusCode())
                 .extract().asString();
 
-        assertThat(body).contains("/some/unknown/path");
-        assertThat(body).doesNotContain("custom");
+        assertThat(body).contains("/some/unknown/path").doesNotContain("custom");
     }
 
     @Test
@@ -136,8 +134,7 @@ class RedirectRestControllerTest {
                 .statusCode(OK.getStatusCode())
                 .extract().asString();
 
-        assertThat(body).contains(".*test-ui/subTest.*");
-        assertThat(body).contains("/new/path/subTest");
+        assertThat(body).contains(".*test-ui/subTest.*").contains("/new/path/subTest");
     }
 
     @Test
