@@ -25,6 +25,7 @@ import io.quarkus.qute.Template;
 
 @Path("/{path:.*}")
 @ApplicationScoped
+@SuppressWarnings("java:S3655")
 public class RedirectRestController {
 
     @Inject
