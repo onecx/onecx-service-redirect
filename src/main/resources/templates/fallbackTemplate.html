@@ -1,17 +1,10 @@
 <html>
-<head>
-    <script>
-        const reqPath = "{reqPath}";
-    </script>
-    <script>
-        try {
-          window.location.href = reqPath;
-        } catch (e) {
-          console.error("Redirect failed:", e);
-        }
-    </script>
-    <noscript>
-        <p>You need to enable JavaScript!</p>
-    </noscript>
-</head>
+    <body>
+        <div>
+            <h1>502 - Bad Gateway</h1>
+            <p>No matching route found for:</p>
+            <p>"{reqPath}"</p>
+            <p>Please check the URL or contact support.</p>
+        </div>
+    </body>
 </html>

@@ -24,10 +24,16 @@ public interface RedirectConfig {
     Map<String, RewriteRule> urlRewriteRules();
 
     /**
-     * File path to custom template
+     * File path to custom redirect template
      */
-    @WithName("custom-template-path")
-    Optional<String> customTemplatePath();
+    @WithName("custom-redirect-template-path")
+    Optional<String> customRedirectTemplatePath();
+
+    /**
+     * File path to custom fallback template
+     */
+    @WithName("custom-fallback-template-path")
+    Optional<String> customFallbackTemplatePath();
 
     /**
      * Url Redirect Rule

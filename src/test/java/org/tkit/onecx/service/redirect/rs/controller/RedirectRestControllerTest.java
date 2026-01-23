@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -46,9 +47,9 @@ class RedirectRestControllerTest {
     }
 
     @Test
-    void usesFallbackWhenNoRule() {
+    void usesFallbackWhenNoRuleMatches() {
         Mockito.when(redirectConfig.urlRewriteRules()).thenReturn(Map.of());
-        Mockito.when(redirectConfig.customTemplatePath()).thenReturn(Optional.empty());
+        Mockito.when(redirectConfig.customFallbackTemplatePath()).thenReturn(Optional.empty());
 
         var body = given()
                 .accept(TEXT_HTML)
@@ -58,6 +59,82 @@ class RedirectRestControllerTest {
                 .extract().asString();
 
         assertThat(body).contains("/some/unknown/path");
+    }
+
+    @Test
+    void usesCustomFallbackWhenNoRuleMatches() throws IOException {
+        Path tmp = Files.createTempFile("tpl", ".html");
+        Files.writeString(tmp, "custom {reqPath}", StandardCharsets.UTF_8);
+
+        Mockito.when(redirectConfig.urlRewriteRules()).thenReturn(Map.of());
+        Mockito.when(redirectConfig.customFallbackTemplatePath()).thenReturn(Optional.of(tmp.toString()));
+
+        var body = given()
+                .accept(TEXT_HTML)
+                .get("/some/unknown/path")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().asString();
+        assertThat(body).contains("custom").contains("some/unknown/path");
+    }
+
+    @Test
+    void usesFallbackWhenNoRuleMatchesAndCustomTemplateFailed() throws IOException {
+        Path tmp = Files.createTempFile("tpl", ".html");
+        Files.writeString(tmp, "custom {reqPath}", StandardCharsets.UTF_8);
+
+        Mockito.when(redirectConfig.urlRewriteRules()).thenReturn(Map.of());
+        Mockito.when(redirectConfig.customFallbackTemplatePath()).thenReturn(Optional.of("not/existing/path.html"));
+
+        var body = given()
+                .accept(TEXT_HTML)
+                .get("/some/unknown/path")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().asString();
+
+        assertThat(body).contains("/some/unknown/path").doesNotContain("custom");
+    }
+
+    @Test
+    void appliesBestMatchingRule() {
+        var ruleMap = new HashMap<String, RedirectConfig.RewriteRule>();
+
+        ruleMap.put(".*test-ui.*", new RedirectConfig.RewriteRule() {
+            @Override
+            public String pattern() {
+                return ".*test-ui.*";
+            }
+
+            @Override
+            public String replacePattern() {
+                return "/new/path";
+            }
+        });
+
+        ruleMap.put(".*test-ui/subTest.*", new RedirectConfig.RewriteRule() {
+            @Override
+            public String pattern() {
+                return ".*test-ui/subTest.*";
+            }
+
+            @Override
+            public String replacePattern() {
+                return "/new/path/subTest";
+            }
+        });
+
+        Mockito.when(redirectConfig.urlRewriteRules()).thenReturn(ruleMap);
+        Mockito.when(redirectConfig.customRedirectTemplatePath()).thenReturn(Optional.empty());
+
+        var body = given()
+                .accept(TEXT_HTML)
+                .get("/test-ui/subTest")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().asString();
+
+        assertThat(body).contains(".*test-ui/subTest.*").contains("/new/path/subTest");
     }
 
     @Test
@@ -73,7 +150,7 @@ class RedirectRestControllerTest {
                 return "/new/path";
             }
         }));
-        Mockito.when(redirectConfig.customTemplatePath()).thenReturn(Optional.empty());
+        Mockito.when(redirectConfig.customRedirectTemplatePath()).thenReturn(Optional.empty());
 
         var body = given()
                 .accept(TEXT_HTML)
@@ -102,7 +179,7 @@ class RedirectRestControllerTest {
                 return "/custom/replaced";
             }
         }));
-        Mockito.when(redirectConfig.customTemplatePath()).thenReturn(Optional.of(tmp.toString()));
+        Mockito.when(redirectConfig.customRedirectTemplatePath()).thenReturn(Optional.of(tmp.toString()));
 
         var body = given()
                 .accept(TEXT_HTML)
@@ -129,7 +206,7 @@ class RedirectRestControllerTest {
                 return "/fallback/replaced";
             }
         }));
-        Mockito.when(redirectConfig.customTemplatePath()).thenReturn(Optional.of("/non/existing/path.html"));
+        Mockito.when(redirectConfig.customRedirectTemplatePath()).thenReturn(Optional.of("/non/existing/path.html"));
 
         var body = given()
                 .accept(TEXT_HTML)
