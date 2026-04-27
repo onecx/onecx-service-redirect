@@ -1,11 +1,12 @@
 <html>
 <head>
     <script>
-        const rules = {rules};
-    </script>
-    <script>
+        // Unified redirect template: applies path rewrite and host rewrite when available
         try {
-            const fullUrl = window.location.href;
+            const rules = {rules};
+            let redirectUrl = window.location.href;
+
+            // Apply path rewrite first if a matching rule exists
             for (const rule of rules) {
                 const regex = new RegExp(rule.pattern);
                 const match = fullUrl.match(regex);
@@ -26,7 +27,6 @@
             console.error('Redirect rule evaluation failed:', err);
         }
         return null;
-    }
     </script>
     <noscript>
         <p>You need to enable JavaScript!</p>

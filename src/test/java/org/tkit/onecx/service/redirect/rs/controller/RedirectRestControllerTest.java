@@ -18,6 +18,7 @@ import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
 
 import org.eclipse.microprofile.config.Config;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.tkit.onecx.service.redirect.rs.RedirectConfig;
@@ -44,6 +45,13 @@ class RedirectRestControllerTest {
         RedirectConfig config() {
             return config.unwrap(SmallRyeConfig.class).getConfigMapping(RedirectConfig.class);
         }
+    }
+
+    @BeforeEach
+    void setUpHostRules() {
+        Mockito.when(redirectConfig.hostForwardRules()).thenReturn(Map.of());
+        Mockito.when(redirectConfig.rules()).thenReturn(ruleConfig(RedirectConfig.RuleMode.COMBINED, 10));
+        Mockito.when(redirectConfig.bundledRedirectTemplateName()).thenReturn(Optional.empty());
     }
 
     private static RedirectConfig.ClientRule clientRule(String pattern, String replacePattern) {
@@ -147,6 +155,7 @@ class RedirectRestControllerTest {
 
         assertThat(body).contains(".*test-ui.*");
         assertThat(body).contains("/new/path");
+        assertThat(body).doesNotContain("new-host.example.com");
     }
 
     @Test
@@ -169,6 +178,65 @@ class RedirectRestControllerTest {
         assertThat(body).contains("custom");
         assertThat(body).contains(".*custom-test.*");
         assertThat(body).contains("/custom/replaced");
+    }
+
+    @Test
+    void usesRedirectWaitTemplateWithConfiguredWaitSeconds() {
+        Mockito.when(redirectConfig.urlRewriteRules()).thenReturn(Map.of(
+                ".*wait-test.*", Map.of(
+                        "0", clientRule(".*wait-test.*", "/wait/replaced"))));
+        Mockito.when(redirectConfig.customRedirectTemplatePath())
+                .thenReturn(Optional.of(Path.of("src/main/resources/templates/redirectWaitTemplate.html")
+                        .toAbsolutePath().toString()));
+        Mockito.when(redirectConfig.rules()).thenReturn(ruleConfig(RedirectConfig.RuleMode.COMBINED, 7));
+
+        var body = given()
+                .accept(TEXT_HTML)
+                .get("/wait-test/path")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().asString();
+
+        assertThat(body).contains("aria-label=\"Redirecting in 7 seconds\"");
+        assertThat(body).contains("id=\"ring-number\">7</div>");
+        assertThat(body).contains("const TOTAL_SECONDS = 7;");
+    }
+
+    @Test
+    void usesBundledRedirectTemplateWhenConfigured() {
+        Mockito.when(redirectConfig.urlRewriteRules()).thenReturn(Map.of(
+                ".*wait-test.*", Map.of(
+                        "0", clientRule(".*wait-test.*", "/wait/replaced"))));
+        Mockito.when(redirectConfig.bundledRedirectTemplateName()).thenReturn(Optional.of("redirectWaitTemplate.html"));
+        Mockito.when(redirectConfig.rules()).thenReturn(ruleConfig(RedirectConfig.RuleMode.COMBINED, 8));
+
+        var body = given()
+                .accept(TEXT_HTML)
+                .get("/wait-test/path")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().asString();
+
+        assertThat(body).contains("aria-label=\"Redirecting in 8 seconds\"");
+        assertThat(body).contains("const TOTAL_SECONDS = 8;");
+    }
+
+    @Test
+    void fallsBackToDefaultTemplateWhenBundledTemplateNameIsInvalid() {
+        Mockito.when(redirectConfig.urlRewriteRules()).thenReturn(Map.of(
+                ".*wait-test.*", Map.of(
+                        "0", clientRule(".*wait-test.*", "/wait/replaced"))));
+        Mockito.when(redirectConfig.bundledRedirectTemplateName()).thenReturn(Optional.of("missing-template.html"));
+
+        var body = given()
+                .accept(TEXT_HTML)
+                .get("/wait-test/path")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().asString();
+
+        assertThat(body).contains("/wait/replaced");
+        assertThat(body).doesNotContain("aria-label=\"Redirecting in");
     }
 
     @Test
@@ -240,6 +308,152 @@ class RedirectRestControllerTest {
                 .extract().asString();
 
         assertThat(body).contains("/some/path");
+    }
+
+    @Test
+    void redirectsToProxyHostWhenHostRuleMatches() {
+        Mockito.when(redirectConfig.hostForwardRules()).thenReturn(Map.of(
+                "rule-1", hostForwardRule("localhost", "new-host.example.com", Optional.empty())));
+        Mockito.when(redirectConfig.urlRewriteRules()).thenReturn(Map.of());
+
+        var body = given()
+                .accept(TEXT_HTML)
+                .get("/some/path")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().asString();
+
+        assertThat(body).contains("new-host.example.com");
+    }
+
+    @Test
+    void redirectsToProxyHostWithExplicitProtocol() {
+        Mockito.when(redirectConfig.hostForwardRules()).thenReturn(Map.of(
+                "rule-1", hostForwardRule("localhost", "new-host.example.com", Optional.of("https"))));
+        Mockito.when(redirectConfig.urlRewriteRules()).thenReturn(Map.of());
+
+        var body = given()
+                .accept(TEXT_HTML)
+                .get("/some/path")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().asString();
+
+        assertThat(body).contains("new-host.example.com").contains("https");
+    }
+
+    @Test
+    void appliesHostAndPathRewriteInCombinedModeWhenBothRulesMatch() {
+        Mockito.when(redirectConfig.hostForwardRules()).thenReturn(Map.of(
+                "rule-1", hostForwardRule("localhost", "new-host.example.com", Optional.empty())));
+        Mockito.when(redirectConfig.urlRewriteRules()).thenReturn(Map.of(
+                ".*some/path.*", Map.of(
+                        "0", clientRule(".*some/path.*", "/rewritten/path"))));
+        Mockito.when(redirectConfig.rules()).thenReturn(ruleConfig(RedirectConfig.RuleMode.COMBINED, 10));
+
+        var body = given()
+                .accept(TEXT_HTML)
+                .get("/some/path")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().asString();
+
+        assertThat(body).contains("new-host.example.com");
+        assertThat(body).contains("/rewritten/path");
+    }
+
+    @Test
+    void appliesOnlyHostForwardInSeparateModeWhenBothRulesMatch() {
+        Mockito.when(redirectConfig.hostForwardRules()).thenReturn(Map.of(
+                "rule-1", hostForwardRule("localhost", "new-host.example.com", Optional.empty())));
+        Mockito.when(redirectConfig.urlRewriteRules()).thenReturn(Map.of(
+                ".*some/path.*", Map.of(
+                        "0", clientRule(".*some/path.*", "/rewritten/path"))));
+        Mockito.when(redirectConfig.rules()).thenReturn(ruleConfig(RedirectConfig.RuleMode.SEPARATE, 10));
+
+        var body = given()
+                .accept(TEXT_HTML)
+                .get("/some/path")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().asString();
+
+        assertThat(body).contains("new-host.example.com");
+        assertThat(body).doesNotContain("/rewritten/path");
+    }
+
+    @Test
+    void fallsBackToUrlRewriteRuleWhenNoHostRuleMatches() {
+        Mockito.when(redirectConfig.hostForwardRules()).thenReturn(Map.of(
+                "rule-1", hostForwardRule("other-host", "new-host.example.com", Optional.empty())));
+        Mockito.when(redirectConfig.urlRewriteRules()).thenReturn(Map.of(
+                ".*some/path.*", Map.of(
+                        "0", clientRule(".*some/path.*", "/rewritten/path"))));
+        Mockito.when(redirectConfig.customRedirectTemplatePath()).thenReturn(Optional.empty());
+
+        var body = given()
+                .accept(TEXT_HTML)
+                .get("/some/path")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().asString();
+
+        assertThat(body).contains("/rewritten/path");
+        assertThat(body).doesNotContain("new-host.example.com");
+    }
+
+    @Test
+    void appliesPathRewriteInSeparateModeWhenNoHostRuleMatches() {
+        Mockito.when(redirectConfig.hostForwardRules()).thenReturn(Map.of(
+                "rule-1", hostForwardRule("other-host", "new-host.example.com", Optional.empty())));
+        Mockito.when(redirectConfig.urlRewriteRules()).thenReturn(Map.of(
+                ".*some/path.*", Map.of(
+                        "0", clientRule(".*some/path.*", "/rewritten/path"))));
+        Mockito.when(redirectConfig.rules()).thenReturn(ruleConfig(RedirectConfig.RuleMode.SEPARATE, 10));
+
+        var body = given()
+                .accept(TEXT_HTML)
+                .get("/some/path")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().asString();
+
+        assertThat(body).contains("/rewritten/path");
+        assertThat(body).doesNotContain("new-host.example.com");
+    }
+
+    private static RedirectConfig.HostForwardRule hostForwardRule(String hostPattern, String proxyHost,
+            Optional<String> proxyProtocol) {
+        return new RedirectConfig.HostForwardRule() {
+            @Override
+            public String hostPattern() {
+                return hostPattern;
+            }
+
+            @Override
+            public String proxyHost() {
+                return proxyHost;
+            }
+
+            @Override
+            public Optional<String> proxyProtocol() {
+                return proxyProtocol;
+            }
+        };
+    }
+
+    private static RedirectConfig.RuleConfig ruleConfig(RedirectConfig.RuleMode mode, int redirectWaitSeconds) {
+        return new RedirectConfig.RuleConfig() {
+            @Override
+            public RedirectConfig.RuleMode mode() {
+                return mode;
+            }
+
+            @Override
+            public int redirectWaitSeconds() {
+                return redirectWaitSeconds;
+            }
+        };
     }
 
 }

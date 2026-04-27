@@ -57,8 +57,100 @@ onecx.redirect.url-rewrite-rules."<server-side-key>"."<index>".replace-pattern=<
 
 | Property | Description |
 |---|---|
-| `onecx.redirect.custom-redirect-template-path` | Path to a custom HTML template used when a rule group matches. The template receives a `{rules}` variable (JSON array). |
+| `onecx.redirect.host-forward-rules."<ruleId>".host-pattern` | Regex matched against incoming host. |
+| `onecx.redirect.host-forward-rules."<ruleId>".proxy-host` | Target proxy host for matching host-pattern. |
+| `onecx.redirect.host-forward-rules."<ruleId>".proxy-protocol` | Optional target protocol (`http` or `https`). |
+| `onecx.redirect.rules.mode` | Rule evaluation mode: `combined` (default) or `separate`. |
+| `onecx.redirect.bundled-redirect-template-name` | Name of a bundled classpath template in `src/main/resources/templates` (for example `redirectWaitTemplate.html`). |
+| `onecx.redirect.custom-redirect-template-path` | Path to a custom HTML template used when a rule group matches. The template receives `{rules}` and optional `{hostForwardRule}`. |
 | `onecx.redirect.custom-fallback-template-path` | Path to a custom HTML template used when no rule group matches. The template receives a `{reqPath}` variable. |
+
+---
+
+## Using Redirect Wait Template
+
+If you want a countdown page before redirecting, use `redirectWaitTemplate.html` and configure `onecx.redirect.rules.redirect-wait-seconds`.
+
+Template resolution priority:
+
+- `onecx.redirect.custom-redirect-template-path` (filesystem path) - highest priority
+- `onecx.redirect.bundled-redirect-template-name` (classpath template in jar)
+- default injected `redirectTemplate.html`
+
+### Option 1: application.properties
+
+```ini
+# Enable wait redirect template from filesystem
+onecx.redirect.custom-redirect-template-path=/deployments/config/redirectWaitTemplate.html
+
+# Wait time used by redirectWaitTemplate.html
+onecx.redirect.rules.redirect-wait-seconds=10
+
+# Optional: host/path rule mode
+onecx.redirect.rules.mode=combined
+```
+
+To use the bundled template from the JAR instead of a filesystem file:
+
+```ini
+onecx.redirect.bundled-redirect-template-name=redirectWaitTemplate.html
+onecx.redirect.rules.redirect-wait-seconds=10
+onecx.redirect.rules.mode=combined
+```
+
+Notes:
+
+- `custom-redirect-template-path` must point to a file on the container filesystem.
+- The default value for `onecx.redirect.rules.redirect-wait-seconds` is `10`.
+
+### Option 2: Helm (values.yaml)
+
+For this chart, configure runtime properties via `app.config.values` and mount the wait template file via `app.data.import`.
+
+```yaml
+app:
+  config:
+    enabled: true
+    values: |
+      onecx.redirect.custom-redirect-template-path=/deployments/config/redirectWaitTemplate.html
+      onecx.redirect.rules.redirect-wait-seconds=10
+      onecx.redirect.rules.mode=combined
+
+  data:
+    import:
+      enabled: true
+      # The mounted file path used above in custom-redirect-template-path
+      mountPath: /deployments/config/redirectWaitTemplate.html
+      subPath: redirectWaitTemplate.html
+      values: |
+        <!-- Paste the exact content of src/main/resources/templates/redirectWaitTemplate.html -->
+        <!DOCTYPE html>
+        <html lang="en">
+        ...
+        </html>
+```
+
+Environment-variable style is also possible in Helm (`app.env`), for example:
+
+```yaml
+app:
+  env:
+    ONECX_REDIRECT_RULES_REDIRECT_WAIT_SECONDS: "10"
+    ONECX_REDIRECT_RULES_MODE: "combined"
+    ONECX_REDIRECT_CUSTOM_REDIRECT_TEMPLATE_PATH: "/deployments/config/redirectWaitTemplate.html"
+```
+
+If you want to use the bundled wait template from the JAR via Helm (no file mount):
+
+```yaml
+app:
+  env:
+    ONECX_REDIRECT_BUNDLED_REDIRECT_TEMPLATE_NAME: "redirectWaitTemplate.html"
+    ONECX_REDIRECT_RULES_REDIRECT_WAIT_SECONDS: "10"
+    ONECX_REDIRECT_RULES_MODE: "combined"
+```
+
+When using env vars only, ensure the template file is still mounted (or baked into the image) at the configured path.
 
 ---
 

@@ -7,6 +7,7 @@ import io.quarkus.runtime.annotations.ConfigDocFilename;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
 import io.smallrye.config.ConfigMapping;
+import io.smallrye.config.WithDefault;
 import io.smallrye.config.WithName;
 
 /**
@@ -16,6 +17,19 @@ import io.smallrye.config.WithName;
 @ConfigRoot(phase = ConfigPhase.RUN_TIME)
 @ConfigMapping(prefix = "onecx.redirect")
 public interface RedirectConfig {
+
+    /**
+     * Host forwarding rules.
+     * The map key is a rule id. Each rule contains its own host-pattern and proxy target.
+     */
+    @WithName("host-forward-rules")
+    Map<String, HostForwardRule> hostForwardRules();
+
+    /**
+     * Rule evaluation settings.
+     */
+    @WithName("rules")
+    RuleConfig rules();
 
     /**
      * Url Redirect Rules.
@@ -33,10 +47,79 @@ public interface RedirectConfig {
     Optional<String> customRedirectTemplatePath();
 
     /**
+     * Bundled redirect template name loaded from classpath templates.
+     * Example: {@code redirectWaitTemplate.html}.
+     *
+     * @return optional bundled redirect template name
+     */
+    @WithName("bundled-redirect-template-name")
+    Optional<String> bundledRedirectTemplateName();
+
+    /**
      * File path to custom fallback template
      */
     @WithName("custom-fallback-template-path")
     Optional<String> customFallbackTemplatePath();
+
+    /**
+     * Host forwarding rule.
+     */
+    interface HostForwardRule {
+
+        /**
+         * Regex matched against the incoming request host.
+         *
+         * @return host matching regex
+         */
+        @WithName("host-pattern")
+        String hostPattern();
+
+        /**
+         * Target proxy host (e.g. "new-host.example.com" or "new-host.example.com:8443").
+         *
+         * @return proxy host
+         */
+        @WithName("proxy-host")
+        String proxyHost();
+
+        /**
+         * Optional target protocol (e.g. "https").
+         *
+         * @return optional proxy protocol
+         */
+        @WithName("proxy-protocol")
+        Optional<String> proxyProtocol();
+    }
+
+    /**
+     * Rules evaluation mode.
+     */
+    interface RuleConfig {
+
+        /**
+         * combined: host forwarding and path rewrite are applied in one flow.
+         * separate: host forwarding and path rewrite are evaluated independently.
+         *
+         * @return configured rules mode
+         */
+        @WithName("mode")
+        @WithDefault("combined")
+        RuleMode mode();
+
+        /**
+         * Redirect wait time in seconds.
+         *
+         * @return redirect wait time in seconds
+         */
+        @WithName("redirect-wait-seconds")
+        @WithDefault("10")
+        int redirectWaitSeconds();
+    }
+
+    enum RuleMode {
+        COMBINED,
+        SEPARATE
+    }
 
     /**
      * A single client-side rewrite rule (pattern + replacement).

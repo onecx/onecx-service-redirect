@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Redirecting&hellip;</title>
+    <style>
+        :root { --magenta: #E20074; --magenta-hover: #B8005C; --magenta-tint: #fce6f2; --gray-900: #191919; --gray-600: #6B6B6B; --gray-200: #DEDEDE; --gray-100: #F4F4F4; --white: #FFFFFF; --radius: 4px; --font: 'TeleNeo', Arial, Helvetica, sans-serif; --ring-r: 42; --ring-c: 263.89; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        [hidden] { display: none !important; }
+        body { font-family: var(--font); background: var(--gray-100); color: var(--gray-900); min-height: 100dvh; display: flex; flex-direction: column; }
+        main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 16px; }
+        .card { background: var(--white); border-radius: 8px; box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08); padding: 48px 40px 40px; width: 100%; max-width: 460px; text-align: center; }
+        .ring-wrapper { position: relative; width: 96px; height: 96px; margin: 0 auto 32px; }
+        .ring-wrapper svg { transform: rotate(-90deg); display: block; }
+        .ring-track { fill: none; stroke: var(--gray-200); stroke-width: 6; }
+        .ring-fill { fill: none; stroke: var(--magenta); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.9s linear; }
+        .ring-number { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.875rem; font-weight: 700; color: var(--magenta); pointer-events: none; }
+        h1 { font-size: 1.375rem; font-weight: 700; color: var(--gray-900); margin-bottom: 12px; line-height: 1.3; }
+        .description { font-size: 0.9375rem; color: var(--gray-600); line-height: 1.6; margin-bottom: 32px; }
+        .description strong { color: var(--gray-900); }
+        .destination-link { display: block; margin-bottom: 16px; font-size: 0.875rem; color: var(--gray-600); word-break: break-all; }
+        .destination-info { display: block; margin-bottom: 16px; font-size: 0.875rem; color: var(--gray-600); word-break: break-all; }
+        .btn-redirect { display: block; width: 100%; padding: 14px 24px; background: var(--magenta); color: var(--white); border: 2px solid transparent; border-radius: var(--radius); font-family: var(--font); font-size: 1rem; font-weight: 700; cursor: pointer; text-align: center; text-decoration: none; transition: background-color 0.15s ease; }
+        .btn-redirect:hover { background: var(--magenta-hover); }
+        .btn-redirect:focus-visible { outline: 3px solid var(--magenta); outline-offset: 3px; background: var(--magenta-hover); }
+        .btn-redirect:disabled { opacity: 0.45; cursor: not-allowed; }
+        .no-target .ring-wrapper { opacity: 0.35; }
+        .no-target .ring-fill { stroke: var(--gray-200); }
+        .no-target .ring-number { color: var(--gray-600); }
+        .fallback-note { margin-top: 20px; font-size: 0.8rem; color: var(--gray-600); line-height: 1.5; }
+        .card--error .ring-wrapper { display: none; }
+        .card--error h1 { color: #C0392B; }
+        @media (max-width: 480px) { .card { padding: 36px 24px 32px; } h1 { font-size: 1.25rem; } }
+        @media (prefers-reduced-motion: reduce) { .ring-fill { transition: none; } }
+    </style>
+</head>
+<body>
+
+<main>
+    <div class="card" id="card">
+
+        <!-- Countdown ring -->
+        <div class="ring-wrapper"
+             role="timer"
+             aria-live="polite"
+             aria-atomic="true"
+               aria-label="Redirecting in {redirectWaitSeconds} seconds">
+            <svg width="96" height="96" viewBox="0 0 96 96" aria-hidden="true">
+                <circle class="ring-track" cx="48" cy="48" r="42"/>
+                <circle class="ring-fill" cx="48" cy="48" r="42" id="ring-fill"
+                        stroke-dasharray="263.89" stroke-dashoffset="0"/>
+            </svg>
+            <div class="ring-number" aria-hidden="true" id="ring-number">{redirectWaitSeconds}</div>
+        </div>
+
+        <h1 id="card-heading">You are being redirected</h1>
+
+        <a class="destination-link"
+           id="destination-link" hidden>
+        </a>
+        <p class="destination-info" id="destination-info" hidden>No redirect target resolved</p>
+
+        <button class="btn-redirect"
+                id="btn-skip"
+                type="button"
+                onclick="redirectNow()">
+            Redirect now
+        </button>
+
+        <p class="fallback-note" id="fallback-note">
+            Not redirected? Check that JavaScript is enabled in your browser.
+        </p>
+
+    </div>
+</main>
+
+<!-- ─────────── scripts ─────────── -->
+<script>
+    /* Template variables injected server-side.
+       rules is always an array (possibly empty).
+       hostForwardRule is optional and, when present, is applied after path rewrite. */
+    const rules = {rules};
+    {#if hostForwardRule}
+    const hostForwardRule = {
+        proxyHost: "{hostForwardRule.proxyHost()}",
+        proxyProtocol: "{hostForwardRule.proxyProtocol().orElse('')}"
+    };
+    {#else}
+    const hostForwardRule = null;
+    {/if}
+    const TOTAL_SECONDS = {redirectWaitSeconds};
+    const CIRCUMFERENCE = 2 * Math.PI * 42; // ≈ 263.89
+
+    let remainingSeconds = TOTAL_SECONDS;
+    let timer       = null;
+    let targetUrl   = null;
+
+    /* ── URL resolution ────────────────────────────────────────────── */
+    function applyHostRewrite(url) {
+        if (!hostForwardRule || !hostForwardRule.proxyHost) {
+            return url;
+        }
+        const protocol = hostForwardRule.proxyProtocol && hostForwardRule.proxyProtocol.trim() !== ''
+            ? hostForwardRule.proxyProtocol
+            : new URL(url, window.location.origin).protocol.slice(0, -1);
+        const target = new URL(url, window.location.origin);
+        target.hostname = hostForwardRule.proxyHost;
+        target.protocol = protocol + ':';
+        return target.href;
+    }
+
+    function resolvePathRedirectUrl() {
+        try {
+            const fullUrl = window.location.href;
+            for (const rule of rules) {
+                const regex = new RegExp(rule.pattern);
+                const match = fullUrl.match(regex);
+                if (match) {
+                    let url;
+                    if (match.groups && Object.keys(match.groups).length > 0) {
+                        url = rule.replacePattern;
+                        for (const [key, value] of Object.entries(match.groups)) {
+                            url = url.replace('($' + key + ')', value);
+                        }
+                    } else {
+                        url = fullUrl.replace(regex, rule.replacePattern);
+                    }
+                    return url;
+                }
+            }
+        } catch (err) {
+            console.error('Redirect rule evaluation failed:', err);
+        }
+        return null;
+    }
+
+    function resolveRedirectUrl() {
+        let resolvedUrl = window.location.href;
+        const pathUrl = resolvePathRedirectUrl();
+
+        if (pathUrl && pathUrl.trim() !== '') {
+            resolvedUrl = new URL(pathUrl, window.location.origin).href;
+        }
+
+        return applyHostRewrite(resolvedUrl);
+    }
+
+    /* ── Perform redirect ───────────────────────────────────────────── */
+    function doRedirect() {
+        if (targetUrl) {
+            window.location.replace(targetUrl);
+        }
+    }
+
+    /* ── Skip button / external call ────────────────────────────────── */
+    function redirectNow() {
+        clearInterval(timer);
+        doRedirect();
+    }
+
+    /* ── Update ring & text every second ───────────────────────────── */
+    function tick() {
+        remainingSeconds -= 1;
+
+        const offset = CIRCUMFERENCE * (1 - (remainingSeconds / TOTAL_SECONDS));
+        document.getElementById('ring-fill').setAttribute('stroke-dashoffset', offset);
+        document.getElementById('ring-number').textContent      = remainingSeconds;
+
+        if (remainingSeconds <= 0) {
+            clearInterval(timer);
+            doRedirect();
+        }
+    }
+
+    /* ── Initialise ─────────────────────────────────────────────────── */
+    (function init() {
+        targetUrl = resolveRedirectUrl();
+        const hasTarget = targetUrl !== null && targetUrl.trim() !== '';
+        const card = document.getElementById('card');
+
+        const button = document.getElementById('btn-skip');
+
+        button.disabled = !hasTarget;
+        const fullTargetUrl = hasTarget ? new URL(targetUrl, window.location.origin).href : null;
+
+        if (hasTarget) {
+            const link = document.getElementById('destination-link');
+            link.textContent = fullTargetUrl;
+            link.href = fullTargetUrl;
+            link.hidden = false;
+            document.getElementById('destination-info').hidden = true;
+        }
+        if (!hasTarget) {
+           document.getElementById('destination-info').hidden = false;
+           document.getElementById('destination-link').hidden = true;
+        }
+
+        if (!hasTarget) {
+            card.classList.add('no-target');
+            remainingSeconds = 0;
+            document.getElementById('ring-number').textContent = '0';
+        }
+
+        if (hasTarget) {
+            timer = setInterval(tick, 1000);
+        }
+    })();
+</script>
+
+<noscript>
+    <style>
+        .ring-wrapper, #btn-skip { display: none !important; }
+    </style>
+    <div style="padding:16px;text-align:center;font-family:Arial,sans-serif;color:#191919;">
+        JavaScript is required for this redirect to work.
+        Please enable JavaScript in your browser and reload the page.
+    </div>
+</noscript>
+
+</body>
+</html>
+ 

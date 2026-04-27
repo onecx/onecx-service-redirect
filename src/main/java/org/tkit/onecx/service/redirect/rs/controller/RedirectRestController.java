@@ -46,22 +46,36 @@ public class RedirectRestController {
     public Response redirectIncomingRequest(@Context UriInfo uriInfo) {
         String fullPath = uriInfo.getRequestUri().toString();
 
-        Map<String, RedirectConfig.ClientRule> clientRules = redirectConfig.urlRewriteRules().entrySet().stream()
-                .filter(entry -> fullPath.matches(entry.getKey()))
-                .max((e1, e2) -> {
-                    // Prefer the more specific pattern (longer pattern = more specific)
-                    int matchLength1 = e1.getKey().replace("\\.\\*", "").length();
-                    int matchLength2 = e2.getKey().replace("\\.\\*", "").length();
-                    return Integer.compare(matchLength1, matchLength2);
-                })
-                .map(Map.Entry::getValue)
+        RedirectConfig.RuleConfig ruleConfig = redirectConfig.rules();
+        RedirectConfig.RuleMode rulesMode = ruleConfig.mode();
+        int redirectWaitSeconds = ruleConfig.redirectWaitSeconds();
+
+        // Evaluate host-forward rules using host-pattern in each rule.
+        String host = uriInfo.getRequestUri().getHost();
+        RedirectConfig.HostForwardRule matchedHostForwardRule = redirectConfig.hostForwardRules().values().stream()
+                .filter(rule -> host.matches(rule.hostPattern()))
+                .findFirst()
                 .orElse(null);
 
-        Template tpl = redirectTemplate;
+        Map<String, RedirectConfig.ClientRule> clientRules = null;
 
-        // if no matching rule group is found, use fallback template
-        if (clientRules == null) {
-            tpl = fallbackTemplate;
+        // In separate mode, when a host-forward rule matched, path rewrite is intentionally skipped.
+        if (rulesMode == RedirectConfig.RuleMode.COMBINED || matchedHostForwardRule == null) {
+            clientRules = redirectConfig.urlRewriteRules().entrySet().stream()
+                    .filter(entry -> fullPath.matches(entry.getKey()))
+                    .max((e1, e2) -> {
+                        // Prefer the more specific pattern (longer pattern = more specific)
+                        int matchLength1 = e1.getKey().replace("\\.\\*", "").length();
+                        int matchLength2 = e2.getKey().replace("\\.\\*", "").length();
+                        return Integer.compare(matchLength1, matchLength2);
+                    })
+                    .map(Map.Entry::getValue)
+                    .orElse(null);
+        }
+
+        // If neither host nor path rules matched, use fallback template
+        if (matchedHostForwardRule == null && clientRules == null) {
+            Template tpl = fallbackTemplate;
 
             // use custom fallback template if provided
             if (redirectConfig.customFallbackTemplatePath().isPresent()) {
@@ -79,6 +93,8 @@ public class RedirectRestController {
             return Response.ok(tpl.data("reqPath", fullPath).render()).build();
         }
 
+        Template tpl = redirectTemplate;
+
         // use custom redirect template if provided
         if (redirectConfig.customRedirectTemplatePath().isPresent()) {
             try {
@@ -89,13 +105,24 @@ public class RedirectRestController {
                 Log.error("Failed to load custom redirect template from path: " + redirectConfig.customRedirectTemplatePath(),
                         e);
             }
+        } else if (redirectConfig.bundledRedirectTemplateName().isPresent()) {
+            String templateName = redirectConfig.bundledRedirectTemplateName().get();
+            Template bundledTemplate = engine.getTemplate(templateName);
+            if (bundledTemplate != null) {
+                tpl = bundledTemplate;
+            } else {
+                Log.warn("Bundled redirect template not found: " + templateName + ", using default redirectTemplate");
+            }
         }
 
-        // Sort rules by their numeric index key and serialize to a JSON array for the template
-        String rulesJson = RedirectUtils.rulesToJson(clientRules);
+        // Pass host-forward rule and path rules to the template.
+        String rulesJson = clientRules != null ? RedirectUtils.rulesToJson(clientRules) : "[]";
 
-        return Response
-                .ok(tpl.data("rules", new RawString(rulesJson)).render())
-                .build();
+        io.quarkus.qute.TemplateInstance instance = tpl
+                .data("hostForwardRule", matchedHostForwardRule)
+                .data("rules", new RawString(rulesJson))
+                .data("redirectWaitSeconds", redirectWaitSeconds);
+
+        return Response.ok(instance.render()).build();
     }
 }
