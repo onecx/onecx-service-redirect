@@ -55,14 +55,14 @@ public class RedirectRestController {
                 matchedHostForwardRule);
 
         // If neither host nor path rules matched, use fallback template
-        if (matchedHostForwardRule == null && clientRules == null) {
+        if (matchedHostForwardRule == null && clientRules.isEmpty()) {
             return Response.ok(loadFallbackTemplate().data("reqPath", fullPath).render()).build();
         }
 
         Template tpl = loadRedirectTemplate();
 
         // Pass host-forward rule and path rules to the template.
-        String rulesJson = clientRules != null ? RedirectUtils.rulesToJson(clientRules) : "[]";
+        String rulesJson = clientRules.isEmpty() ? "[]" : RedirectUtils.rulesToJson(clientRules);
 
         io.quarkus.qute.TemplateInstance instance = tpl
                 .data("hostForwardRule", matchedHostForwardRule)
@@ -83,7 +83,7 @@ public class RedirectRestController {
             RedirectConfig.RuleMode rulesMode,
             RedirectConfig.HostForwardRule matchedHostForwardRule) {
         if (rulesMode == RedirectConfig.RuleMode.SEPARATE && matchedHostForwardRule != null) {
-            return null;
+            return Map.of();
         }
 
         return redirectConfig.urlRewriteRules().entrySet().stream()
@@ -94,7 +94,7 @@ public class RedirectRestController {
                     return Integer.compare(matchLength1, matchLength2);
                 })
                 .map(Map.Entry::getValue)
-                .orElse(null);
+                .orElse(Map.of());
     }
 
     private Template loadFallbackTemplate() {
