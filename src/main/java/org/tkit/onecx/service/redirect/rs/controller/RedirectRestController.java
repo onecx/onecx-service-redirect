@@ -50,70 +50,16 @@ public class RedirectRestController {
         RedirectConfig.RuleMode rulesMode = ruleConfig.mode();
         int redirectWaitSeconds = ruleConfig.redirectWaitSeconds();
 
-        // Evaluate host-forward rules using host-pattern in each rule.
-        String host = uriInfo.getRequestUri().getHost();
-        RedirectConfig.HostForwardRule matchedHostForwardRule = redirectConfig.hostForwardRules().values().stream()
-                .filter(rule -> host.matches(rule.hostPattern()))
-                .findFirst()
-                .orElse(null);
-
-        Map<String, RedirectConfig.ClientRule> clientRules = null;
-
-        // In separate mode, when a host-forward rule matched, path rewrite is intentionally skipped.
-        if (rulesMode == RedirectConfig.RuleMode.COMBINED || matchedHostForwardRule == null) {
-            clientRules = redirectConfig.urlRewriteRules().entrySet().stream()
-                    .filter(entry -> fullPath.matches(entry.getKey()))
-                    .max((e1, e2) -> {
-                        // Prefer the more specific pattern (longer pattern = more specific)
-                        int matchLength1 = e1.getKey().replace("\\.\\*", "").length();
-                        int matchLength2 = e2.getKey().replace("\\.\\*", "").length();
-                        return Integer.compare(matchLength1, matchLength2);
-                    })
-                    .map(Map.Entry::getValue)
-                    .orElse(null);
-        }
+        RedirectConfig.HostForwardRule matchedHostForwardRule = findMatchedHostForwardRule(uriInfo.getRequestUri().getHost());
+        Map<String, RedirectConfig.ClientRule> clientRules = findMatchedClientRules(fullPath, rulesMode,
+                matchedHostForwardRule);
 
         // If neither host nor path rules matched, use fallback template
         if (matchedHostForwardRule == null && clientRules == null) {
-            Template tpl = fallbackTemplate;
-
-            // use custom fallback template if provided
-            if (redirectConfig.customFallbackTemplatePath().isPresent()) {
-                try {
-                    String content = Files.readString(Paths.get(redirectConfig.customFallbackTemplatePath().get()),
-                            StandardCharsets.UTF_8);
-                    tpl = engine.parse(content);
-                } catch (IOException e) {
-                    Log.error(
-                            "Failed to load custom fallback template from path: " + redirectConfig.customFallbackTemplatePath(),
-                            e);
-                }
-            }
-
-            return Response.ok(tpl.data("reqPath", fullPath).render()).build();
+            return Response.ok(loadFallbackTemplate().data("reqPath", fullPath).render()).build();
         }
 
-        Template tpl = redirectTemplate;
-
-        // use custom redirect template if provided
-        if (redirectConfig.customRedirectTemplatePath().isPresent()) {
-            try {
-                String content = Files.readString(Paths.get(redirectConfig.customRedirectTemplatePath().get()),
-                        StandardCharsets.UTF_8);
-                tpl = engine.parse(content);
-            } catch (IOException e) {
-                Log.error("Failed to load custom redirect template from path: " + redirectConfig.customRedirectTemplatePath(),
-                        e);
-            }
-        } else if (redirectConfig.bundledRedirectTemplateName().isPresent()) {
-            String templateName = redirectConfig.bundledRedirectTemplateName().get();
-            Template bundledTemplate = engine.getTemplate(templateName);
-            if (bundledTemplate != null) {
-                tpl = bundledTemplate;
-            } else {
-                Log.warn("Bundled redirect template not found: " + templateName + ", using default redirectTemplate");
-            }
-        }
+        Template tpl = loadRedirectTemplate();
 
         // Pass host-forward rule and path rules to the template.
         String rulesJson = clientRules != null ? RedirectUtils.rulesToJson(clientRules) : "[]";
@@ -124,5 +70,66 @@ public class RedirectRestController {
                 .data("redirectWaitSeconds", redirectWaitSeconds);
 
         return Response.ok(instance.render()).build();
+    }
+
+    private RedirectConfig.HostForwardRule findMatchedHostForwardRule(String host) {
+        return redirectConfig.hostForwardRules().values().stream()
+                .filter(rule -> host.matches(rule.hostPattern()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Map<String, RedirectConfig.ClientRule> findMatchedClientRules(String fullPath,
+            RedirectConfig.RuleMode rulesMode,
+            RedirectConfig.HostForwardRule matchedHostForwardRule) {
+        if (rulesMode == RedirectConfig.RuleMode.SEPARATE && matchedHostForwardRule != null) {
+            return null;
+        }
+
+        return redirectConfig.urlRewriteRules().entrySet().stream()
+                .filter(entry -> fullPath.matches(entry.getKey()))
+                .max((e1, e2) -> {
+                    int matchLength1 = e1.getKey().replace("\\.\\*", "").length();
+                    int matchLength2 = e2.getKey().replace("\\.\\*", "").length();
+                    return Integer.compare(matchLength1, matchLength2);
+                })
+                .map(Map.Entry::getValue)
+                .orElse(null);
+    }
+
+    private Template loadFallbackTemplate() {
+        if (redirectConfig.customFallbackTemplatePath().isPresent()) {
+            return parseTemplateFromPath(redirectConfig.customFallbackTemplatePath().get(), fallbackTemplate,
+                    "Failed to load custom fallback template from path: " + redirectConfig.customFallbackTemplatePath());
+        }
+        return fallbackTemplate;
+    }
+
+    private Template loadRedirectTemplate() {
+        if (redirectConfig.customRedirectTemplatePath().isPresent()) {
+            return parseTemplateFromPath(redirectConfig.customRedirectTemplatePath().get(), redirectTemplate,
+                    "Failed to load custom redirect template from path: " + redirectConfig.customRedirectTemplatePath());
+        }
+
+        if (redirectConfig.bundledRedirectTemplateName().isPresent()) {
+            String templateName = redirectConfig.bundledRedirectTemplateName().get();
+            Template bundledTemplate = engine.getTemplate(templateName);
+            if (bundledTemplate != null) {
+                return bundledTemplate;
+            }
+            Log.warn("Bundled redirect template not found: " + templateName + ", using default redirectTemplate");
+        }
+
+        return redirectTemplate;
+    }
+
+    private Template parseTemplateFromPath(String templatePath, Template defaultTemplate, String errorMessage) {
+        try {
+            String content = Files.readString(Paths.get(templatePath), StandardCharsets.UTF_8);
+            return engine.parse(content);
+        } catch (IOException e) {
+            Log.error(errorMessage, e);
+            return defaultTemplate;
+        }
     }
 }

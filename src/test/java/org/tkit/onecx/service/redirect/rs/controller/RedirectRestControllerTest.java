@@ -197,9 +197,10 @@ class RedirectRestControllerTest {
                 .statusCode(OK.getStatusCode())
                 .extract().asString();
 
-        assertThat(body).contains("aria-label=\"Redirecting in 7 seconds\"");
-        assertThat(body).contains("id=\"ring-number\">7</div>");
-        assertThat(body).contains("const TOTAL_SECONDS = 7;");
+        assertThat(body)
+                .contains("aria-label=\"Redirecting in 7 seconds\"")
+                .contains("id=\"ring-number\">7</div>")
+                .contains("const TOTAL_SECONDS = 7;");
     }
 
     @Test
@@ -217,8 +218,9 @@ class RedirectRestControllerTest {
                 .statusCode(OK.getStatusCode())
                 .extract().asString();
 
-        assertThat(body).contains("aria-label=\"Redirecting in 8 seconds\"");
-        assertThat(body).contains("const TOTAL_SECONDS = 8;");
+        assertThat(body)
+                .contains("aria-label=\"Redirecting in 8 seconds\"")
+                .contains("const TOTAL_SECONDS = 8;");
     }
 
     @Test
@@ -235,8 +237,9 @@ class RedirectRestControllerTest {
                 .statusCode(OK.getStatusCode())
                 .extract().asString();
 
-        assertThat(body).contains("/wait/replaced");
-        assertThat(body).doesNotContain("aria-label=\"Redirecting in");
+        assertThat(body)
+                .contains("/wait/replaced")
+                .doesNotContain("aria-label=\"Redirecting in");
     }
 
     @Test
@@ -358,8 +361,9 @@ class RedirectRestControllerTest {
                 .statusCode(OK.getStatusCode())
                 .extract().asString();
 
-        assertThat(body).contains("new-host.example.com");
-        assertThat(body).contains("/rewritten/path");
+        assertThat(body)
+                .contains("new-host.example.com")
+                .contains("/rewritten/path");
     }
 
     @Test
@@ -378,8 +382,9 @@ class RedirectRestControllerTest {
                 .statusCode(OK.getStatusCode())
                 .extract().asString();
 
-        assertThat(body).contains("new-host.example.com");
-        assertThat(body).doesNotContain("/rewritten/path");
+        assertThat(body)
+                .contains("new-host.example.com")
+                .doesNotContain("/rewritten/path");
     }
 
     @Test
@@ -398,8 +403,9 @@ class RedirectRestControllerTest {
                 .statusCode(OK.getStatusCode())
                 .extract().asString();
 
-        assertThat(body).contains("/rewritten/path");
-        assertThat(body).doesNotContain("new-host.example.com");
+        assertThat(body)
+                .contains("/rewritten/path")
+                .doesNotContain("new-host.example.com");
     }
 
     @Test
@@ -418,8 +424,9 @@ class RedirectRestControllerTest {
                 .statusCode(OK.getStatusCode())
                 .extract().asString();
 
-        assertThat(body).contains("/rewritten/path");
-        assertThat(body).doesNotContain("new-host.example.com");
+        assertThat(body)
+                .contains("/rewritten/path")
+                .doesNotContain("new-host.example.com");
     }
 
     private static RedirectConfig.HostForwardRule hostForwardRule(String hostPattern, String proxyHost,

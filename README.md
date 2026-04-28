@@ -61,6 +61,7 @@ onecx.redirect.url-rewrite-rules."<server-side-key>"."<index>".replace-pattern=<
 | `onecx.redirect.host-forward-rules."<ruleId>".proxy-host` | Target proxy host for matching host-pattern. |
 | `onecx.redirect.host-forward-rules."<ruleId>".proxy-protocol` | Optional target protocol (`http` or `https`). |
 | `onecx.redirect.rules.mode` | Rule evaluation mode: `combined` (default) or `separate`. |
+| `onecx.redirect.rules.redirect-wait-seconds` | Wait time in seconds used by `redirectWaitTemplate.html` (default `10`). |
 | `onecx.redirect.bundled-redirect-template-name` | Name of a bundled classpath template in `src/main/resources/templates` (for example `redirectWaitTemplate.html`). |
 | `onecx.redirect.custom-redirect-template-path` | Path to a custom HTML template used when a rule group matches. The template receives `{rules}` and optional `{hostForwardRule}`. |
 | `onecx.redirect.custom-fallback-template-path` | Path to a custom HTML template used when no rule group matches. The template receives a `{reqPath}` variable. |
@@ -140,6 +141,8 @@ app:
     ONECX_REDIRECT_CUSTOM_REDIRECT_TEMPLATE_PATH: "/deployments/config/redirectWaitTemplate.html"
 ```
 
+  This env example uses a filesystem template, so the file must be mounted (or baked into the image).
+
 If you want to use the bundled wait template from the JAR via Helm (no file mount):
 
 ```yaml
@@ -150,7 +153,7 @@ app:
     ONECX_REDIRECT_RULES_MODE: "combined"
 ```
 
-When using env vars only, ensure the template file is still mounted (or baked into the image) at the configured path.
+When using `ONECX_REDIRECT_BUNDLED_REDIRECT_TEMPLATE_NAME`, no file mount is needed because the template is loaded from the application JAR classpath.
 
 ---
 
