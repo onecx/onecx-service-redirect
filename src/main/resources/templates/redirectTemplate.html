@@ -9,24 +9,35 @@
             // Apply path rewrite first if a matching rule exists
             for (const rule of rules) {
                 const regex = new RegExp(rule.pattern);
-                const match = fullUrl.match(regex);
+                const match = redirectUrl.match(regex);
                 if (match) {
-                    let url;
+                    let rewrittenUrl = rule.replacePattern;
                     if (match.groups && Object.keys(match.groups).length > 0) {
-                        url = rule.replacePattern;
                         for (const [key, value] of Object.entries(match.groups)) {
-                            url = url.replace('($' + key + ')', value);
+                            rewrittenUrl = rewrittenUrl.replace('($' + key + ')', value);
                         }
                     } else {
-                        url = fullUrl.replace(regex, rule.replacePattern);
+                        rewrittenUrl = redirectUrl.replace(regex, rule.replacePattern);
                     }
-                    return url;
+                    redirectUrl = new URL(rewrittenUrl, window.location.origin).href;
+                    break;
                 }
             }
-        } catch (err) {
-            console.error('Redirect rule evaluation failed:', err);
+
+            // Apply host/protocol rewrite if a host-forward rule matched
+            {#if hostForwardRule}
+                const target = new URL(redirectUrl);
+                const proxyHost = "{hostForwardRule.proxyHost()}";
+                const proxyProtocol = "{hostForwardRule.proxyProtocol().orElse('')}" || target.protocol.slice(0, -1);
+                target.hostname = proxyHost;
+                target.protocol = proxyProtocol + ":";
+                redirectUrl = target.href;
+            {/if}
+
+            window.location.href = redirectUrl;
+        } catch (e) {
+            console.error("Redirect failed:", e);
         }
-        return null;
     </script>
     <noscript>
         <p>You need to enable JavaScript!</p>
