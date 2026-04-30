@@ -7,7 +7,7 @@ h|[.header-title]##Configuration property##
 h|Type
 h|Default
 
-a| [[onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-host-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-host-pattern[`onecx.redirect.host-forward-rules."host-forward-rules".host-pattern`]##
+a| [[onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-host-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-host-pattern[`+++onecx.redirect.host-forward-rules."host-forward-rules".host-pattern+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.host-forward-rules."host-forward-rules".host-pattern+++[]
 endif::add-copy-button-to-config-props[]
@@ -28,7 +28,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |required icon:exclamation-circle[title=Configuration property is required]
 
-a| [[onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-proxy-host]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-proxy-host[`onecx.redirect.host-forward-rules."host-forward-rules".proxy-host`]##
+a| [[onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-proxy-host]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-proxy-host[`+++onecx.redirect.host-forward-rules."host-forward-rules".proxy-host+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.host-forward-rules."host-forward-rules".proxy-host+++[]
 endif::add-copy-button-to-config-props[]
@@ -49,7 +49,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |required icon:exclamation-circle[title=Configuration property is required]
 
-a| [[onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-proxy-protocol]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-proxy-protocol[`onecx.redirect.host-forward-rules."host-forward-rules".proxy-protocol`]##
+a| [[onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-proxy-protocol]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-proxy-protocol[`+++onecx.redirect.host-forward-rules."host-forward-rules".proxy-protocol+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.host-forward-rules."host-forward-rules".proxy-protocol+++[]
 endif::add-copy-button-to-config-props[]
@@ -70,7 +70,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |
 
-a| [[onecx-service-redirect_onecx-redirect-rules-mode]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-rules-mode[`onecx.redirect.rules.mode`]##
+a| [[onecx-service-redirect_onecx-redirect-rules-mode]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-rules-mode[`+++onecx.redirect.rules.mode+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.rules.mode+++[]
 endif::add-copy-button-to-config-props[]
@@ -91,7 +91,7 @@ endif::add-copy-button-to-env-var[]
 a|`combined`, `separate`
 |`+++combined+++`
 
-a| [[onecx-service-redirect_onecx-redirect-rules-redirect-wait-seconds]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-rules-redirect-wait-seconds[`onecx.redirect.rules.redirect-wait-seconds`]##
+a| [[onecx-service-redirect_onecx-redirect-rules-redirect-wait-seconds]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-rules-redirect-wait-seconds[`+++onecx.redirect.rules.redirect-wait-seconds+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.rules.redirect-wait-seconds+++[]
 endif::add-copy-button-to-config-props[]
@@ -112,7 +112,7 @@ endif::add-copy-button-to-env-var[]
 |int
 |`+++10+++`
 
-a| [[onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-pattern[`onecx.redirect.url-rewrite-rules."url-rewrite-rules".pattern`]##
+a| [[onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-pattern[`+++onecx.redirect.url-rewrite-rules."url-rewrite-rules".pattern+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.url-rewrite-rules."url-rewrite-rules".pattern+++[]
 endif::add-copy-button-to-config-props[]
@@ -133,7 +133,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |required icon:exclamation-circle[title=Configuration property is required]
 
-a| [[onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-replace-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-replace-pattern[`onecx.redirect.url-rewrite-rules."url-rewrite-rules".replace-pattern`]##
+a| [[onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-replace-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-replace-pattern[`+++onecx.redirect.url-rewrite-rules."url-rewrite-rules".replace-pattern+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.url-rewrite-rules."url-rewrite-rules".replace-pattern+++[]
 endif::add-copy-button-to-config-props[]
@@ -154,7 +154,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |required icon:exclamation-circle[title=Configuration property is required]
 
-a| [[onecx-service-redirect_onecx-redirect-custom-redirect-template-path]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-custom-redirect-template-path[`onecx.redirect.custom-redirect-template-path`]##
+a| [[onecx-service-redirect_onecx-redirect-custom-redirect-template-path]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-custom-redirect-template-path[`+++onecx.redirect.custom-redirect-template-path+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.custom-redirect-template-path+++[]
 endif::add-copy-button-to-config-props[]
@@ -175,7 +175,28 @@ endif::add-copy-button-to-env-var[]
 |string
 |
 
-a| [[onecx-service-redirect_onecx-redirect-custom-fallback-template-path]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-custom-fallback-template-path[`onecx.redirect.custom-fallback-template-path`]##
+a| [[onecx-service-redirect_onecx-redirect-bundled-redirect-template-name]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-bundled-redirect-template-name[`+++onecx.redirect.bundled-redirect-template-name+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++onecx.redirect.bundled-redirect-template-name+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Bundled redirect template name loaded from classpath templates. Example: `redirectWaitTemplate.html`.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++ONECX_REDIRECT_BUNDLED_REDIRECT_TEMPLATE_NAME+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++ONECX_REDIRECT_BUNDLED_REDIRECT_TEMPLATE_NAME+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|
+
+a| [[onecx-service-redirect_onecx-redirect-custom-fallback-template-path]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-custom-fallback-template-path[`+++onecx.redirect.custom-fallback-template-path+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.custom-fallback-template-path+++[]
 endif::add-copy-button-to-config-props[]
