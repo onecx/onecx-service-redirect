@@ -4,6 +4,8 @@
         // Unified redirect template: applies path rewrite and host rewrite when available
         try {
             const rules = {rules};
+            const hostForwardRuleJson = {hostForwardRule};
+            const hostForwardRule = hostForwardRuleJson ? JSON.parse(hostForwardRuleJson) : null;
             let redirectUrl = window.location.href;
 
             // Apply path rewrite first if a matching rule exists
@@ -25,14 +27,33 @@
             }
 
             // Apply host/protocol rewrite if a host-forward rule matched
-            {#if hostForwardRule}
+            if (hostForwardRule) {
                 const target = new URL(redirectUrl);
-                const proxyHost = "{hostForwardRule.proxyHost()}";
-                const proxyProtocol = "{hostForwardRule.proxyProtocol().orElse('')}" || target.protocol.slice(0, -1);
-                target.hostname = proxyHost;
-                target.protocol = proxyProtocol + ":";
-                redirectUrl = target.href;
-            {/if}
+                const hostRegex = new RegExp(hostForwardRule.hostPattern);
+                const hostMatch = target.hostname.match(hostRegex);
+                
+                if (hostMatch) {
+                    let newHostname = hostForwardRule.hostReplacePattern;
+                    
+                    // Replace capture groups in hostname replacement
+                    if (hostMatch.groups && Object.keys(hostMatch.groups).length > 0) {
+                        for (const [key, value] of Object.entries(hostMatch.groups)) {
+                            newHostname = newHostname.replace('($' + key + ')', value);
+                        }
+                    } else {
+                        newHostname = target.hostname.replace(hostRegex, hostForwardRule.hostReplacePattern);
+                    }
+                    
+                    target.hostname = newHostname;
+                    
+                    // Apply protocol replacement if provided
+                    if (hostForwardRule.protocolReplacePattern) {
+                        target.protocol = hostForwardRule.protocolReplacePattern + ":";
+                    }
+                    
+                    redirectUrl = target.href;
+                }
+            }
 
             window.location.href = redirectUrl;
         } catch (e) {

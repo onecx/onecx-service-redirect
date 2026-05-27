@@ -58,8 +58,8 @@ onecx.redirect.url-rewrite-rules."<server-side-key>"."<index>".replace-pattern=<
 | Property | Description |
 |---|---|
 | `onecx.redirect.host-forward-rules."<ruleId>".host-pattern` | Regex matched against incoming host. |
-| `onecx.redirect.host-forward-rules."<ruleId>".proxy-host` | Target proxy host for matching host-pattern. |
-| `onecx.redirect.host-forward-rules."<ruleId>".proxy-protocol` | Optional target protocol (`http` or `https`). |
+| `onecx.redirect.host-forward-rules."<ruleId>".host-replace-pattern` | Replacement pattern for matched hostname. Supports regex capture groups with `$1`, `$2`, etc. or named groups `($name)`. |
+| `onecx.redirect.host-forward-rules."<ruleId>".protocol-replace-pattern` | Optional target protocol replacement (e.g. `https`). If not set, the original protocol is used. |
 | `onecx.redirect.rules.mode` | Rule evaluation mode: `combined` (default) or `separate`. |
 | `onecx.redirect.rules.redirect-wait-seconds` | Wait time in seconds used by `redirectWaitTemplate.html` (default `10`). |
 | `onecx.redirect.bundled-redirect-template-name` | Name of a bundled classpath template in `src/main/resources/templates` (for example `redirectWaitTemplate.html`). |
@@ -260,6 +260,72 @@ onecx.redirect.url-rewrite-rules.".*/app-b.*"."0".replace-pattern=/ui/app-b/deta
 ```
 
 A request to `/app-a/...` only ever receives the `app-a` rules. `app-b` rules are never sent.
+
+---
+
+## Host-Forward Rules
+
+Host-forward rules allow you to redirect requests to a different host while optionally changing the protocol. Like URL rewrite rules, host-forward rules support dynamic replacement using regex patterns and capture groups.
+
+### Static host forwarding
+
+Forward all requests from one host to another:
+
+```ini
+onecx.redirect.host-forward-rules.rule-1.host-pattern=old-domain\\.com
+onecx.redirect.host-forward-rules.rule-1.host-replace-pattern=new-domain.com
+onecx.redirect.host-forward-rules.rule-1.protocol-replace-pattern=https
+```
+
+| Input URL | Output URL |
+|---|---|
+| `http://old-domain.com/app/page` | `https://new-domain.com/app/page` |
+
+### Dynamic host forwarding with capture groups
+
+Forward requests from a subdomain pattern to a different subdomain:
+
+```ini
+onecx.redirect.host-forward-rules.rule-1.host-pattern=(.+)\\.old-domain\\.com
+onecx.redirect.host-forward-rules.rule-1.host-replace-pattern=$1.new-domain.com
+onecx.redirect.host-forward-rules.rule-1.protocol-replace-pattern=https
+```
+
+| Input URL | Output URL |
+|---|---|
+| `http://api.old-domain.com/users` | `https://api.new-domain.com/users` |
+| `http://app.old-domain.com/settings` | `https://app.new-domain.com/settings` |
+
+The regex capture group `(.+)` matches the subdomain prefix (e.g., `api` or `app`), and `$1` references it in the replacement.
+
+### Rule evaluation modes
+
+The `onecx.redirect.rules.mode` setting controls how host and path rules interact:
+
+- **`combined` (default):** Both host and path rules are applied in sequence. First, path rules rewrite the URL, then the host-forward rule (if matched) is applied.
+- **`separate`:** If a host-forward rule matches, path rules are skipped. Only the matched host is rewritten.
+
+Example with `separate` mode:
+
+```ini
+# Host rule
+onecx.redirect.host-forward-rules.rule-1.host-pattern=old-host\\.com
+onecx.redirect.host-forward-rules.rule-1.host-replace-pattern=new-host.com
+
+# Path rule
+onecx.redirect.url-rewrite-rules.".*/app.*"."0".pattern=/old-app/(.+)
+onecx.redirect.url-rewrite-rules.".*/app.*"."0".replace-pattern=/new-app/$1
+
+# Config
+onecx.redirect.rules.mode=separate
+```
+
+| Input URL | Mode | Output URL |
+|---|---|---|
+| `http://old-host.com/app/page` | `separate` | `http://new-host.com/app/page` (host rewritten, path not rewritten) |
+| `http://other-host.com/old-app/page` | `separate` | `http://other-host.com/new-app/page` (path rewritten, host not rewritten) |
+| `http://old-host.com/old-app/page` | `separate` | `http://new-host.com/old-app/page` (only host rewritten) |
+| `http://old-host.com/old-app/page` | `combined` | `http://new-host.com/new-app/page` (both rewritten) |
 
 ---
 

@@ -28,43 +28,43 @@ endif::add-copy-button-to-env-var[]
 |string
 |required icon:exclamation-circle[title=Configuration property is required]
 
-a| [[onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-proxy-host]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-proxy-host[`onecx.redirect.host-forward-rules."host-forward-rules".proxy-host`]##
+a| [[onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-host-replace-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-host-replace-pattern[`onecx.redirect.host-forward-rules."host-forward-rules".host-replace-pattern`]##
 ifdef::add-copy-button-to-config-props[]
-config_property_copy_button:+++onecx.redirect.host-forward-rules."host-forward-rules".proxy-host+++[]
+config_property_copy_button:+++onecx.redirect.host-forward-rules."host-forward-rules".host-replace-pattern+++[]
 endif::add-copy-button-to-config-props[]
 
 
 [.description]
 --
-Target proxy host (e.g. "new-host.example.com" or "new-host.example.com:8443").
+Replacement pattern for the host regex match. Supports capture groups: use ($groupName) or $1, $2, etc. for group replacement. Example: if hostPattern is "(.++*++)++\\++.old-domain++\\++.com" and hostReplacePattern is "$1.new-domain.com", a request to "api.old-domain.com" redirects to "api.new-domain.com".
 
 
 ifdef::add-copy-button-to-env-var[]
-Environment variable: env_var_with_copy_button:+++ONECX_REDIRECT_HOST_FORWARD_RULES__HOST_FORWARD_RULES__PROXY_HOST+++[]
+Environment variable: env_var_with_copy_button:+++ONECX_REDIRECT_HOST_FORWARD_RULES__HOST_FORWARD_RULES__HOST_REPLACE_PATTERN+++[]
 endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
-Environment variable: `+++ONECX_REDIRECT_HOST_FORWARD_RULES__HOST_FORWARD_RULES__PROXY_HOST+++`
+Environment variable: `+++ONECX_REDIRECT_HOST_FORWARD_RULES__HOST_FORWARD_RULES__HOST_REPLACE_PATTERN+++`
 endif::add-copy-button-to-env-var[]
 --
 |string
 |required icon:exclamation-circle[title=Configuration property is required]
 
-a| [[onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-proxy-protocol]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-proxy-protocol[`onecx.redirect.host-forward-rules."host-forward-rules".proxy-protocol`]##
+a| [[onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-protocol-replace-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-protocol-replace-pattern[`onecx.redirect.host-forward-rules."host-forward-rules".protocol-replace-pattern`]##
 ifdef::add-copy-button-to-config-props[]
-config_property_copy_button:+++onecx.redirect.host-forward-rules."host-forward-rules".proxy-protocol+++[]
+config_property_copy_button:+++onecx.redirect.host-forward-rules."host-forward-rules".protocol-replace-pattern+++[]
 endif::add-copy-button-to-config-props[]
 
 
 [.description]
 --
-Optional target protocol (e.g. "https").
+Optional replacement pattern for the target protocol (e.g. "https"). If not provided, the original request protocol is used.
 
 
 ifdef::add-copy-button-to-env-var[]
-Environment variable: env_var_with_copy_button:+++ONECX_REDIRECT_HOST_FORWARD_RULES__HOST_FORWARD_RULES__PROXY_PROTOCOL+++[]
+Environment variable: env_var_with_copy_button:+++ONECX_REDIRECT_HOST_FORWARD_RULES__HOST_FORWARD_RULES__PROTOCOL_REPLACE_PATTERN+++[]
 endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
-Environment variable: `+++ONECX_REDIRECT_HOST_FORWARD_RULES__HOST_FORWARD_RULES__PROXY_PROTOCOL+++`
+Environment variable: `+++ONECX_REDIRECT_HOST_FORWARD_RULES__HOST_FORWARD_RULES__PROTOCOL_REPLACE_PATTERN+++`
 endif::add-copy-button-to-env-var[]
 --
 |string
@@ -170,6 +170,27 @@ Environment variable: env_var_with_copy_button:+++ONECX_REDIRECT_CUSTOM_REDIRECT
 endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
 Environment variable: `+++ONECX_REDIRECT_CUSTOM_REDIRECT_TEMPLATE_PATH+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|
+
+a| [[onecx-service-redirect_onecx-redirect-bundled-redirect-template-name]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-bundled-redirect-template-name[`onecx.redirect.bundled-redirect-template-name`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++onecx.redirect.bundled-redirect-template-name+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Bundled redirect template name loaded from classpath templates. Example: `redirectWaitTemplate.html`.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++ONECX_REDIRECT_BUNDLED_REDIRECT_TEMPLATE_NAME+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++ONECX_REDIRECT_BUNDLED_REDIRECT_TEMPLATE_NAME+++`
 endif::add-copy-button-to-env-var[]
 --
 |string

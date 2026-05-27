@@ -63,9 +63,11 @@ public class RedirectRestController {
 
         // Pass host-forward rule and path rules to the template.
         String rulesJson = clientRules.isEmpty() ? "[]" : RedirectUtils.rulesToJson(clientRules);
+        String hostForwardRuleJson = matchedHostForwardRule == null ? "null"
+                : RedirectUtils.hostForwardRuleToJson(matchedHostForwardRule);
 
         io.quarkus.qute.TemplateInstance instance = tpl
-                .data("hostForwardRule", matchedHostForwardRule)
+                .data("hostForwardRule", new RawString(hostForwardRuleJson))
                 .data("rules", new RawString(rulesJson))
                 .data("redirectWaitSeconds", redirectWaitSeconds);
 

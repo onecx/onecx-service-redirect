@@ -6,6 +6,19 @@ import java.util.stream.Collectors;
 
 public class RedirectUtils {
 
+    /**
+     * Converts a HostForwardRule to JSON representation with pattern and replacement pattern.
+     *
+     * @param rule the host forward rule
+     * @return JSON object string representation
+     */
+    public static String hostForwardRuleToJson(RedirectConfig.HostForwardRule rule) {
+        String protocolPattern = rule.protocolReplacePattern().orElse(null);
+        return "{\"hostPattern\":" + jsonString(rule.hostPattern())
+                + ",\"hostReplacePattern\":" + jsonString(rule.hostReplacePattern())
+                + ",\"protocolReplacePattern\":" + (protocolPattern == null ? "null" : jsonString(protocolPattern)) + "}";
+    }
+
     private RedirectUtils() {
     }
 
