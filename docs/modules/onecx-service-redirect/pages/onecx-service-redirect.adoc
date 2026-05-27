@@ -133,7 +133,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |required icon:exclamation-circle[title=Configuration property is required]
 
-a| [[onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-replace-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-replace-pattern[`onecx.redirect.url-rewrite-rules."url-rewrite-rules".replace-pattern`]##
+a| [[onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-replace-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-replace-pattern[`+++onecx.redirect.url-rewrite-rules."url-rewrite-rules".replace-pattern+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.url-rewrite-rules."url-rewrite-rules".replace-pattern+++[]
 endif::add-copy-button-to-config-props[]
@@ -154,7 +154,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |required icon:exclamation-circle[title=Configuration property is required]
 
-a| [[onecx-service-redirect_onecx-redirect-custom-redirect-template-path]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-custom-redirect-template-path[`onecx.redirect.custom-redirect-template-path`]##
+a| [[onecx-service-redirect_onecx-redirect-custom-redirect-template-path]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-custom-redirect-template-path[`+++onecx.redirect.custom-redirect-template-path+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.custom-redirect-template-path+++[]
 endif::add-copy-button-to-config-props[]
