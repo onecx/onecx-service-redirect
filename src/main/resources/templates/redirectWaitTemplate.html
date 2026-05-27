@@ -80,16 +80,10 @@
 <script>
     /* Template variables injected server-side.
        rules is always an array (possibly empty).
-       hostForwardRule is optional and, when present, is applied after path rewrite. */
+       hostForwardRule is optional JSON object and, when present, is applied after path rewrite. */
     const rules = {rules};
-    {#if hostForwardRule}
-    const hostForwardRule = {
-        proxyHost: "{hostForwardRule.proxyHost()}",
-        proxyProtocol: "{hostForwardRule.proxyProtocol().orElse('')}"
-    };
-    {#else}
-    const hostForwardRule = null;
-    {/if}
+    const hostForwardRuleJson = {hostForwardRule};
+    const hostForwardRule = hostForwardRuleJson ? JSON.parse(hostForwardRuleJson) : null;
     const TOTAL_SECONDS = {redirectWaitSeconds};
     const CIRCUMFERENCE = 2 * Math.PI * 42; // ≈ 263.89
 
@@ -99,15 +93,33 @@
 
     /* ── URL resolution ────────────────────────────────────────────── */
     function applyHostRewrite(url) {
-        if (!hostForwardRule || !hostForwardRule.proxyHost) {
+        if (!hostForwardRule) {
             return url;
         }
-        const protocol = hostForwardRule.proxyProtocol && hostForwardRule.proxyProtocol.trim() !== ''
-            ? hostForwardRule.proxyProtocol
-            : new URL(url, window.location.origin).protocol.slice(0, -1);
         const target = new URL(url, window.location.origin);
-        target.hostname = hostForwardRule.proxyHost;
-        target.protocol = protocol + ':';
+        const hostRegex = new RegExp(hostForwardRule.hostPattern);
+        const hostMatch = target.hostname.match(hostRegex);
+        
+        if (hostMatch) {
+            let newHostname = hostForwardRule.hostReplacePattern;
+            
+            // Replace capture groups in hostname replacement
+            if (hostMatch.groups && Object.keys(hostMatch.groups).length > 0) {
+                for (const [key, value] of Object.entries(hostMatch.groups)) {
+                    newHostname = newHostname.replace('($' + key + ')', value);
+                }
+            } else {
+                newHostname = target.hostname.replace(hostRegex, hostForwardRule.hostReplacePattern);
+            }
+            
+            target.hostname = newHostname;
+            
+            // Apply protocol replacement if provided
+            if (hostForwardRule.protocolReplacePattern) {
+                target.protocol = hostForwardRule.protocolReplacePattern + ":";
+            }
+        }
+        
         return target.href;
     }
 

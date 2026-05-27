@@ -75,20 +75,24 @@ public interface RedirectConfig {
         String hostPattern();
 
         /**
-         * Target proxy host (e.g. "new-host.example.com" or "new-host.example.com:8443").
+         * Replacement pattern for the host regex match.
+         * Supports capture groups: use ($groupName) or $1, $2, etc. for group replacement.
+         * Example: if hostPattern is "(.*)\\.old-domain\\.com" and hostReplacePattern is "$1.new-domain.com",
+         * a request to "api.old-domain.com" redirects to "api.new-domain.com".
          *
-         * @return proxy host
+         * @return host replacement pattern
          */
-        @WithName("proxy-host")
-        String proxyHost();
+        @WithName("host-replace-pattern")
+        String hostReplacePattern();
 
         /**
-         * Optional target protocol (e.g. "https").
+         * Optional replacement pattern for the target protocol (e.g. "https").
+         * If not provided, the original request protocol is used.
          *
-         * @return optional proxy protocol
+         * @return optional protocol replacement pattern
          */
-        @WithName("proxy-protocol")
-        Optional<String> proxyProtocol();
+        @WithName("protocol-replace-pattern")
+        Optional<String> protocolReplacePattern();
     }
 
     /**

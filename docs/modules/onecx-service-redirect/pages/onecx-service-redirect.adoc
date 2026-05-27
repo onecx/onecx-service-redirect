@@ -7,7 +7,7 @@ h|[.header-title]##Configuration property##
 h|Type
 h|Default
 
-a| [[onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-host-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-host-pattern[`+++onecx.redirect.host-forward-rules."host-forward-rules".host-pattern+++`]##
+a| [[onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-host-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-host-pattern[`onecx.redirect.host-forward-rules."host-forward-rules".host-pattern`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.host-forward-rules."host-forward-rules".host-pattern+++[]
 endif::add-copy-button-to-config-props[]
@@ -28,49 +28,49 @@ endif::add-copy-button-to-env-var[]
 |string
 |required icon:exclamation-circle[title=Configuration property is required]
 
-a| [[onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-proxy-host]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-proxy-host[`+++onecx.redirect.host-forward-rules."host-forward-rules".proxy-host+++`]##
+a| [[onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-host-replace-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-host-replace-pattern[`onecx.redirect.host-forward-rules."host-forward-rules".host-replace-pattern`]##
 ifdef::add-copy-button-to-config-props[]
-config_property_copy_button:+++onecx.redirect.host-forward-rules."host-forward-rules".proxy-host+++[]
+config_property_copy_button:+++onecx.redirect.host-forward-rules."host-forward-rules".host-replace-pattern+++[]
 endif::add-copy-button-to-config-props[]
 
 
 [.description]
 --
-Target proxy host (e.g. "new-host.example.com" or "new-host.example.com:8443").
+Replacement pattern for the host regex match. Supports capture groups: use ($groupName) or $1, $2, etc. for group replacement. Example: if hostPattern is "(.++*++)++\\++.old-domain++\\++.com" and hostReplacePattern is "$1.new-domain.com", a request to "api.old-domain.com" redirects to "api.new-domain.com".
 
 
 ifdef::add-copy-button-to-env-var[]
-Environment variable: env_var_with_copy_button:+++ONECX_REDIRECT_HOST_FORWARD_RULES__HOST_FORWARD_RULES__PROXY_HOST+++[]
+Environment variable: env_var_with_copy_button:+++ONECX_REDIRECT_HOST_FORWARD_RULES__HOST_FORWARD_RULES__HOST_REPLACE_PATTERN+++[]
 endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
-Environment variable: `+++ONECX_REDIRECT_HOST_FORWARD_RULES__HOST_FORWARD_RULES__PROXY_HOST+++`
+Environment variable: `+++ONECX_REDIRECT_HOST_FORWARD_RULES__HOST_FORWARD_RULES__HOST_REPLACE_PATTERN+++`
 endif::add-copy-button-to-env-var[]
 --
 |string
 |required icon:exclamation-circle[title=Configuration property is required]
 
-a| [[onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-proxy-protocol]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-proxy-protocol[`+++onecx.redirect.host-forward-rules."host-forward-rules".proxy-protocol+++`]##
+a| [[onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-protocol-replace-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-host-forward-rules-host-forward-rules-protocol-replace-pattern[`onecx.redirect.host-forward-rules."host-forward-rules".protocol-replace-pattern`]##
 ifdef::add-copy-button-to-config-props[]
-config_property_copy_button:+++onecx.redirect.host-forward-rules."host-forward-rules".proxy-protocol+++[]
+config_property_copy_button:+++onecx.redirect.host-forward-rules."host-forward-rules".protocol-replace-pattern+++[]
 endif::add-copy-button-to-config-props[]
 
 
 [.description]
 --
-Optional target protocol (e.g. "https").
+Optional replacement pattern for the target protocol (e.g. "https"). If not provided, the original request protocol is used.
 
 
 ifdef::add-copy-button-to-env-var[]
-Environment variable: env_var_with_copy_button:+++ONECX_REDIRECT_HOST_FORWARD_RULES__HOST_FORWARD_RULES__PROXY_PROTOCOL+++[]
+Environment variable: env_var_with_copy_button:+++ONECX_REDIRECT_HOST_FORWARD_RULES__HOST_FORWARD_RULES__PROTOCOL_REPLACE_PATTERN+++[]
 endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
-Environment variable: `+++ONECX_REDIRECT_HOST_FORWARD_RULES__HOST_FORWARD_RULES__PROXY_PROTOCOL+++`
+Environment variable: `+++ONECX_REDIRECT_HOST_FORWARD_RULES__HOST_FORWARD_RULES__PROTOCOL_REPLACE_PATTERN+++`
 endif::add-copy-button-to-env-var[]
 --
 |string
 |
 
-a| [[onecx-service-redirect_onecx-redirect-rules-mode]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-rules-mode[`+++onecx.redirect.rules.mode+++`]##
+a| [[onecx-service-redirect_onecx-redirect-rules-mode]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-rules-mode[`onecx.redirect.rules.mode`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.rules.mode+++[]
 endif::add-copy-button-to-config-props[]
@@ -91,7 +91,7 @@ endif::add-copy-button-to-env-var[]
 a|`combined`, `separate`
 |`+++combined+++`
 
-a| [[onecx-service-redirect_onecx-redirect-rules-redirect-wait-seconds]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-rules-redirect-wait-seconds[`+++onecx.redirect.rules.redirect-wait-seconds+++`]##
+a| [[onecx-service-redirect_onecx-redirect-rules-redirect-wait-seconds]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-rules-redirect-wait-seconds[`onecx.redirect.rules.redirect-wait-seconds`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.rules.redirect-wait-seconds+++[]
 endif::add-copy-button-to-config-props[]
@@ -112,7 +112,7 @@ endif::add-copy-button-to-env-var[]
 |int
 |`+++10+++`
 
-a| [[onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-pattern[`+++onecx.redirect.url-rewrite-rules."url-rewrite-rules".pattern+++`]##
+a| [[onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-pattern]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-url-rewrite-rules-url-rewrite-rules-pattern[`onecx.redirect.url-rewrite-rules."url-rewrite-rules".pattern`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.url-rewrite-rules."url-rewrite-rules".pattern+++[]
 endif::add-copy-button-to-config-props[]
@@ -175,7 +175,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |
 
-a| [[onecx-service-redirect_onecx-redirect-bundled-redirect-template-name]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-bundled-redirect-template-name[`+++onecx.redirect.bundled-redirect-template-name+++`]##
+a| [[onecx-service-redirect_onecx-redirect-bundled-redirect-template-name]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-bundled-redirect-template-name[`onecx.redirect.bundled-redirect-template-name`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.bundled-redirect-template-name+++[]
 endif::add-copy-button-to-config-props[]
@@ -196,7 +196,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |
 
-a| [[onecx-service-redirect_onecx-redirect-custom-fallback-template-path]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-custom-fallback-template-path[`+++onecx.redirect.custom-fallback-template-path+++`]##
+a| [[onecx-service-redirect_onecx-redirect-custom-fallback-template-path]] [.property-path]##link:#onecx-service-redirect_onecx-redirect-custom-fallback-template-path[`onecx.redirect.custom-fallback-template-path`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++onecx.redirect.custom-fallback-template-path+++[]
 endif::add-copy-button-to-config-props[]
