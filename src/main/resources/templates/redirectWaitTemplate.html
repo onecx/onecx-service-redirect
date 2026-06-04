@@ -83,7 +83,7 @@
        hostForwardRule is optional JSON object and, when present, is applied after path rewrite. */
     const rules = {rules};
     const hostForwardRuleJson = {hostForwardRule};
-    const hostForwardRule = hostForwardRuleJson ? JSON.parse(hostForwardRuleJson) : null;
+    const hostForwardRule = hostForwardRuleJson && typeof hostForwardRuleJson === 'string' ? JSON.parse(hostForwardRuleJson) : hostForwardRuleJson;
     const TOTAL_SECONDS = {redirectWaitSeconds};
     const CIRCUMFERENCE = 2 * Math.PI * 42; // ≈ 263.89
 

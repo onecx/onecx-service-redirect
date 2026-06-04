@@ -5,7 +5,7 @@
         try {
             const rules = {rules};
             const hostForwardRuleJson = {hostForwardRule};
-            const hostForwardRule = hostForwardRuleJson ? JSON.parse(hostForwardRuleJson) : null;
+            const hostForwardRule = hostForwardRuleJson && typeof hostForwardRuleJson === 'string' ? JSON.parse(hostForwardRuleJson) : hostForwardRuleJson;
             let redirectUrl = window.location.href;
 
             // Apply path rewrite first if a matching rule exists
